@@ -17,6 +17,30 @@
 #   craigrow@hotmail.com
 
 module.exports = (robot) ->
+  # New Feature: check if the team is playing today
+  robot.hear /today (.*)/i, (msg) ->
+    team = msg.match[1]
+    
+    city = getCity(team)
+    day = getToday()
+    month = getMonth()
+    year = getYear()
+
+    url = 'http://mlb.mlb.com/gdcross/components/game/mlb/year_' + year + '/month_' + month + '/day_' + day + '/master_scoreboard.json'
+    msg.send city
+    msg.send year + '-' + month + '-' + day
+    msg.send url
+
+    # Get the MLB data.
+    # Parse though the game data to see if the team has a game.
+    while result.data.games.game[i].home_team_city != city & result.data.games.game[i].away_team_city != city
+      i++
+      if result.data.games.game[i] is undefined
+        break
+    # If the team doesn't have a game, report yesterday's game.
+    # If game.status.status == "Final" report the result.
+    # If game.status.status != "Final" report game in progress.
+
   robot.hear /how (about|bout) (them|those) (.*)/i, (msg) ->
     team = msg.match[3]
 
@@ -26,7 +50,6 @@ module.exports = (robot) ->
     year = getYear()
 
     url = 'http://mlb.mlb.com/gdcross/components/game/mlb/year_' + year + '/month_' + month + '/day_' + day + '/master_scoreboard.json'
-    #msg.send "url: " + url
 
     msg.http(url)
       .get() (err, res, body) ->
@@ -71,6 +94,13 @@ module.exports = (robot) ->
   getDay = () ->
     today = new Date
     dd = today.getDate() - 1
+    if dd < 10
+      dd = '0' + dd
+    else dd
+
+  getToday = () ->
+    today = new Date
+    dd = today.getDate()
     if dd < 10
       dd = '0' + dd
     else dd
