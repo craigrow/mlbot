@@ -1,3 +1,4 @@
+# Re-factoring mlbot
 module.exports = (robot) ->
 	robot.hear /score (.*)/i, (msg) ->
 		# Find the team's city
