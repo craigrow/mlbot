@@ -15,6 +15,7 @@ module.exports = (robot) ->
 		msg.http(url)
 			.get() (err, res, body) ->
 				gameData = JSON.parse(body)
+
 		# Parse the data to see if team has a game today
 				gameNumber = 0
 
@@ -25,12 +26,40 @@ module.exports = (robot) ->
 						break
 				msg.send 'Seattle is in game number: ' + gameNumber
 
+		# Figure out if the team is home or away
+				homeAway = ''
+
+				if gameData.data.games.game[gameNumber].home_team_city is city
+					homeAway = 'home'
+				else if gameData.data.games.game[gameNumber].away_team_city is city
+					homeAway = 'away'
+				else
+					homeAway = 'error'
+					msg.send homeAway
+
+		# Find the score of each team
+				myTeamScore = ''
+				opponentTeamScore = ''
+
+				if city is gameData.data.games.game[gameNumber].home_team_city
+					myTeamScore = gameData.data.games.game[gameNumber].linescore.r.home
+					opponentTeamScore = gameData.data.games.game[gameNumber].linescore.r.away
+				else if city is gameData.data.games.game[gameNumber].away_team_city
+					myTeamScore = gameData.data.games.game[gameNumber].linescore.r.away
+					opponentTeamScore = gameData.data.games.game[gameNumber].linescore.r.home
+				else
+					msg.send 'error'
+				msg.send 'myTeamScore: ' + myTeamScore
+		# Check if the game is over
 				if gameData.data.games.game[gameNumber].status.status is 'Final'
 					msg.send 'Game Over'
 				else
 					inning = gameData.data.games.game[gameNumber].status.inning
 					inning_state = gameData.data.games.game[gameNumber].status.inning_state
-					msg.send 'Seattle is still playing in the ' + inning_state + ' of the ' + inning
-		# Check if the game is over
-
 		# If yes, report the score
+					if myTeamScore > opponentTeamScore
+						msg.send 'Seattle is leading in the ' + inning_state + ' of the ' + inning + ' ' + myTeamScore + '-' + opponentTeamScore
+					else if myTeamScore < opponentTeamScore
+						msg.send 'Seattle is trailing in the ' + inning_state + ' of the ' + inning + ' ' + opponentTeamScore + '-' + myTeamScore
+
+
