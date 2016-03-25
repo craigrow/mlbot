@@ -55,14 +55,26 @@ module.exports = (robot) ->
 				msg.send 'Game status: ' + myGame.status.status
 				if myGame.status.status is "Pre-Game" or myGame.status.status is "Preview"
 					awayProbablePitcher = myGame.away_probable_pitcher.last
+					apWins = myGame.away_probable_pitcher.wins
+					apLosses = myGame.away_probable_pitcher.losses
+					apEra = myGame.away_probable_pitcher.era
+					awayPitcherLine = awayProbablePitcher + ' ' + apWins + '-' + apLosses + ' ' + apEra
+
 					homeProbablePitcher = myGame.home_probable_pitcher.last
-					matchup = awayProbablePitcher + ' vs ' + homeProbablePitcher
+					hpWins = myGame.home_probable_pitcher.wins
+					hpLosses = myGame.home_probable_pitcher.losses
+					hpEra = myGame.home_probable_pitcher.era
+					homePitcherLine = homeProbablePitcher + ' ' + hpWins + '-' + hpLosses + ' ' + hpEra
+
+					matchup = awayPitcherLine + ' vs ' + homePitcherLine
 
 					if homeAway is 'home'
-						msg.send 'The ' + team + ' are playing ' + opponentTeam + ' at home today. ' + matchup
+						msg.send 'The ' + team + ' are playing ' + opponentTeam + ' at home today.'
+						msg.send matchup
 					else if homeAway is 'away'
-						msg.send 'The ' + team + ' are playing in ' + opponentTeam + ' today. ' + matchup
-						
+						msg.send 'The ' + team + ' are playing in ' + opponentTeam + ' today.'
+						msg.send matchup
+
 		# Find the score of each team
 				if myGame.status.status is not 'Pre-Game' or myGame.status.status is not 'Preview'
 					myTeamScore = ''
