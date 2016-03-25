@@ -24,7 +24,7 @@ module.exports = (robot) ->
 				while gameData.data.games.game[gameNumber].home_team_city != city & gameData.data.games.game[gameNumber].away_team_city != city
 					gameNumber++
 					if gameData.data.games.game[gameNumber] is undefined
-						msg.send 'Seattle did not play'
+						msg.send team + 'does not play today'
 						break
 				msg.send 'Your team is in game number: ' + gameNumber
 
@@ -51,20 +51,33 @@ module.exports = (robot) ->
 				else
 					opponentTeam = 'error'
 
-		# Find the score of each team
-				myTeamScore = ''
-				opponentTeamScore = ''
+		# Figure out if the game is in progress.
+				msg.send 'Game status: ' + myGame.status.status
+				if myGame.status.status is "Pre-Game" or myGame.status.status is "Preview"
+					awayProbablePitcher = myGame.away_probable_pitcher.last
+					homeProbablePitcher = myGame.home_probable_pitcher.last
+					matchup = awayProbablePitcher + ' vs ' + homeProbablePitcher
 
-				if city is myGame.home_team_city
-					myTeamScore = myGame.linescore.r.home
-					opponentTeamScore = myGame.linescore.r.away
-				else if city is myGame.away_team_city
-					myTeamScore = myGame.linescore.r.away
-					opponentTeamScore = myGame.linescore.r.home
-				else
-					msg.send 'error'
-				msg.send "Your team's score: " + myTeamScore
-				msg.send "Opponent's score: " + opponentTeamScore
+					if homeAway is 'home'
+						msg.send 'The ' + team + ' are playing ' + opponentTeam + ' at home today. ' + matchup
+					else if homeAway is 'away'
+						msg.send 'The ' + team + ' are playing in ' + opponentTeam + ' today. ' + matchup
+						
+		# Find the score of each team
+				if myGame.status.status is not 'Pre-Game' or myGame.status.status is not 'Preview'
+					myTeamScore = ''
+					opponentTeamScore = ''
+
+					if city is myGame.home_team_city
+						myTeamScore = myGame.linescore.r.home
+						opponentTeamScore = myGame.linescore.r.away
+					else if city is myGame.away_team_city
+						myTeamScore = myGame.linescore.r.away
+						opponentTeamScore = myGame.linescore.r.home
+					else
+						msg.send 'error'
+					msg.send "Your team's score: " + myTeamScore
+					msg.send "Opponent's score: " + opponentTeamScore
 
 		# Check if the game is over
 				if myGame.status.status is 'Final'
@@ -72,10 +85,11 @@ module.exports = (robot) ->
 						msg.send 'The ' + team + ' beat ' + opponentTeam + ' today! ' + myGame.linescore.r.away + '-' + myGame.linescore.r.home
 					else if myTeamScore < opponentTeamScore
 						msg.send 'The ' + team + ' lost to ' + opponentTeam + ' today ' + myGame.linescore.r.away + '-' + myGame.linescore.r.home
-				else
+				
+				else if myGame.status.status is 'In-Progress'
 					inning = myGame.status.inning
 					inning_state = myGame.status.inning_state
-		# If in progress, report the score here
+
 					if myTeamScore > opponentTeamScore
 						msg.send 'The ' + team + ' are leading ' + opponentTeam + ' in the ' + inning_state + ' of inning ' + inning + ': ' + myGame.linescore.r.away + '-' + myGame.linescore.r.home
 					else if myTeamScore < opponentTeamScore
@@ -141,7 +155,7 @@ module.exports = (robot) ->
 			city = "Cincinnati"
 		else if team is "Cubs" or team is "cubs" or team is "cubbies" or team is "Cubbies"
 			city = "Chi Cubs"
-		else if team is "Brewers" or "brewers"
+		else if team is "Brewers" or team is "brewers"
 			city = "Milwaukee"
 		else if team is "Cardinals" or team is "cardinals" or team is "cards" or team is "Cards"
 			city = "St. Louis"
@@ -155,7 +169,7 @@ module.exports = (robot) ->
 			city = "Atlanta"
 		else if team is "Marlins" or team is "marlins"
 			city = "Miami"
-		else if team is "Nationals" or "nationals" or "Nats" or "nats"
+		else if team is "Nationals" or team is "nationals" or team is "Nats" or team is "nats"
 			city = "Washington"
 		else if team is "Rays" or team is "rays"
 			city = "Tampa Bay"
