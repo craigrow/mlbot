@@ -3,10 +3,15 @@ module.exports = (robot) ->
 		team = "mariners"
 		city = "Seattle"
 
-		getScore "today", (score) ->
-			msg.send score
+		testData = {}
+		testData.elementOne = "bazinga"
+		msg.send testData.elementOne
+
+		getScore "today", (gameData) ->
+			msg.send gameData.homeCity
 
 	getScore = (day, callback) ->
+		gameData = {}
 		day = '25'
 		month = '03'
 		year = '2016'
@@ -15,5 +20,7 @@ module.exports = (robot) ->
 
 		robot.http(url)
 			.get() (err, res, body) ->
-				gameData = JSON.stringify(body)
+				data = JSON.parse(body)
+				gameData.homeCity = data.data.games.game[0].home_team_city
+
 				callback(gameData)
