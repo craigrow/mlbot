@@ -52,8 +52,10 @@ module.exports = (robot) ->
 					opponentTeam = 'error'
 
 		# Figure out if the game is in progress.
-				msg.send 'Game status: ' + myGame.status.status
-				if myGame.status.status is "Pre-Game" or myGame.status.status is "Preview"
+				gameStatus = myGame.status.status
+				msg.send 'Game status: ' + gameStatus
+				
+				if gameStatus is "Pre-Game" or gameStatus is "Preview"
 					awayProbablePitcher = myGame.away_probable_pitcher.last
 					apWins = myGame.away_probable_pitcher.wins
 					apLosses = myGame.away_probable_pitcher.losses
@@ -76,7 +78,7 @@ module.exports = (robot) ->
 						msg.send matchup
 
 		# Find the score of each team
-				if myGame.status.status is not 'Pre-Game' or myGame.status.status is not 'Preview'
+				else if gameStatus isnt 'Pre-Game' and gameStatus isnt 'Preview'
 					myTeamScore = ''
 					opponentTeamScore = ''
 
@@ -92,13 +94,14 @@ module.exports = (robot) ->
 					msg.send "Opponent's score: " + opponentTeamScore
 
 		# Check if the game is over
-				if myGame.status.status is 'Final'
+				if gameStatus is 'Final'
+					msg.send 'game is over'
 					if myTeamScore > opponentTeamScore
 						msg.send 'The ' + team + ' beat ' + opponentTeam + ' today! ' + myGame.linescore.r.away + '-' + myGame.linescore.r.home
 					else if myTeamScore < opponentTeamScore
 						msg.send 'The ' + team + ' lost to ' + opponentTeam + ' today ' + myGame.linescore.r.away + '-' + myGame.linescore.r.home
-				
-				else if myGame.status.status is 'In-Progress'
+
+				if gameStatus is 'In Progress'
 					inning = myGame.status.inning
 					inning_state = myGame.status.inning_state
 
@@ -106,6 +109,8 @@ module.exports = (robot) ->
 						msg.send 'The ' + team + ' are leading ' + opponentTeam + ' in the ' + inning_state + ' of inning ' + inning + ': ' + myGame.linescore.r.away + '-' + myGame.linescore.r.home
 					else if myTeamScore < opponentTeamScore
 						msg.send 'The ' + team + ' are trailing ' + opponentTeam + ' in the ' + inning_state + ' of inning ' + inning + ': ' + myGame.linescore.r.away + '-' + myGame.linescore.r.home
+					else if myTeamScore = opponentTeamScore
+						msg.send 'The ' + team + ' and ' + opponentTeam + ' are currently tied at ' + myGame.linescore.r.away + ' in the ' + inning_state + ' of inning ' + inning
 
 	getDay = () ->
 		today = new Date
