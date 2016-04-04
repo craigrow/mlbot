@@ -368,7 +368,6 @@ module.exports = (robot) ->
 
 				msg.send standings
 
-
 	getDay = () ->
 		today = new Date
 		dd = today.getDate()
@@ -461,7 +460,7 @@ module.exports = (robot) ->
 		#{data.standing[3].last_name} \t #{data.standing[3].won}-#{data.standing[3].lost}
 		#{data.standing[4].last_name} \t #{data.standing[4].won}-#{data.standing[4].lost}
 
-"""
+		"""
 
 		alEast = """
 
