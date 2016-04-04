@@ -40,7 +40,7 @@ module.exports = (robot) ->
 					if gameData.data.games.game[gameNumber] is undefined
 						break
 				if gameData.data.games.game[gameNumber] is undefined
-					msg.send 'The ' + team + ' did not play today'
+					msg.send 'The ' + team + ' do not play today'
 				else
 					myGame = gameData.data.games.game[gameNumber]
 
