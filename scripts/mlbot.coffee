@@ -13,60 +13,60 @@
 #   standdings alw|alc|ale|nlw|nlc|nle - gives you divisional standings
 #
 # Author:
-#	craigrow
-#   craigrow@hotmail.com
+# craigrow
+# craigrow@hotmail.com
 
 module.exports = (robot) ->
-  robot.hear /how (about|bout) (them|those) (.*)/i, (msg) ->
-    team = msg.match[3]
+  # robot.hear /how (about|bout) (them|those) (.*)/i, (msg) ->
+  #   team = msg.match[3]
 
-    city = getCity(team)
-    day = getDay()
-    month = getMonth()
-    year = getYear()
+  #   city = getCity(team)
+  #   day = getDay()
+  #   month = getMonth()
+  #   year = getYear()
 
-    url = 'http://mlb.mlb.com/gdcross/components/game/mlb/year_' + year + '/month_' + month + '/day_' + day + '/master_scoreboard.json'
-    #msg.send "url: " + url
+  #   url = 'http://mlb.mlb.com/gdcross/components/game/mlb/year_' + year + '/month_' + month + '/day_' + day + '/master_scoreboard.json'
+  #   #msg.send "url: " + url
 
-    msg.http(url)
-      .get() (err, res, body) ->
-        if res.statusCode is 404
-          msg.send "Sorry, it appears there were no games yesterday"
-          return
-        result = JSON.parse(body)
+  #   msg.http(url)
+  #     .get() (err, res, body) ->
+  #       if res.statusCode is 404
+  #         msg.send "Sorry, it appears there were no games yesterday"
+  #         return
+  #       result = JSON.parse(body)
 
-        i = 0
+  #       i = 0
 
-        while result.data.games.game[i].home_team_city != city & result.data.games.game[i].away_team_city != city
-            i++
-            if result.data.games.game[i] is undefined
-              break
+  #       while result.data.games.game[i].home_team_city != city & result.data.games.game[i].away_team_city != city
+  #           i++
+  #           if result.data.games.game[i] is undefined
+  #             break
 
-        if result.data.games is undefined or result.data.games.game[i] is undefined
-          msg.send "The " + team + " did not play yesterday"
-        else
-          away_team_city = result.data.games.game[i].away_team_city
-          away_team_score = result.data.games.game[i].linescore.r.away
-          home_team_city = result.data.games.game[i].home_team_city
-          home_team_score = result.data.games.game[i].linescore.r.home
+  #       if result.data.games is undefined or result.data.games.game[i] is undefined
+  #         msg.send "The " + team + " did not play yesterday"
+  #       else
+  #         away_team_city = result.data.games.game[i].away_team_city
+  #         away_team_score = result.data.games.game[i].linescore.r.away
+  #         home_team_city = result.data.games.game[i].home_team_city
+  #         home_team_score = result.data.games.game[i].linescore.r.home
 
-          winner = findWinner(home_team_city, home_team_score, away_team_city, away_team_score, city)
+  #         winner = findWinner(home_team_city, home_team_score, away_team_city, away_team_score, city)
 
-          msg.send "The " + team + " " + winner + " yesterday"
+  #         msg.send "The " + team + " " + winner + " yesterday"
 
-          gamescore = away_team_city + " "  + away_team_score + " at " + home_team_city + " " + home_team_score
+  #         gamescore = away_team_city + " "  + away_team_score + " at " + home_team_city + " " + home_team_score
 
-          msg.send gamescore
+  #         msg.send gamescore
 
-  robot.respond /standings (.*)|standings/i, (msg) ->
-    division = msg.match[1]
-    msg.http('https://erikberg.com/mlb/standings.json')
-      .header('User-Agent', 'hubot-mlbot (craigrow@hotmail.com)')
-      .get() (err, res, body) ->
-        data = JSON.parse(body)
-        standings = getStandings(data, division)
+  # robot.respond /standings (.*)|standings/i, (msg) ->
+  #   division = msg.match[1]
+  #   msg.http('https://erikberg.com/mlb/standings.json')
+  #     .header('User-Agent', 'hubot-mlbot (craigrow@hotmail.com)')
+  #     .get() (err, res, body) ->
+  #       data = JSON.parse(body)
+  #       standings = getStandings(data, division)
 
-        msg.send standings
+  #       msg.send standings
 
   getDay = () ->
     today = new Date

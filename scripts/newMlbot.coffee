@@ -1,16 +1,30 @@
+# Description:
+#   Get MLB scores and standings
+#
+# Dependencies:
+#   None
+#
+# Configuration:
+#   None
+#
+# Commands:
+#   how bout|about them|those <team name> - tells you how your team did yesterday
+#   standings - gives you the standings for each MLB division
+#   standdings alw|alc|ale|nlw|nlc|nle - gives you divisional standings
+#
+# Author:
+# craigrow
+# craigrow@hotmail.com
+
 module.exports = (robot) ->
-	robot.hear /(.*) score/i, (msg) ->
+	team = ''
+	robot.hear /how (about|bout) (them|those) (.*)/i, (msg) ->
 		# Find the team's city
-		team = msg.match[1]
-		msg.send 'Your team is: ' + team
-		# Just setting this to Seattle for now
+		team = msg.match[3]
 		city = getCity(team)
-		msg.send 'Your city is: ' + city
 
 		# Get game data for today
-		# Setting the date static for now
 		day = getDay()
-		#day = '02'
 		month = getMonth()
 		year = getYear()
 		url = 'http://mlb.mlb.com/gdcross/components/game/mlb/year_' + year + '/month_' + month + '/day_' + day + '/master_scoreboard.json'
@@ -29,10 +43,7 @@ module.exports = (robot) ->
 				if gameData.data.games.game[gameNumber] is undefined
 					msg.send 'The ' + team + ' did not play today'
 				else
-					msg.send 'Your team is in game number: ' + gameNumber
-
 					myGame = gameData.data.games.game[gameNumber]
-					msg.send 'home team is: ' + myGame.home_team_city
 
 		# Figure out if the team is home or away
 					homeAway = ''
@@ -43,7 +54,6 @@ module.exports = (robot) ->
 						homeAway = 'away'
 					else
 						homeAway = 'error'
-					msg.send 'Your team is: ' + homeAway
 
 		# Find the opponent's name
 					opponentTeam = ''
@@ -56,8 +66,7 @@ module.exports = (robot) ->
 
 		# Figure out if the game is in progress.
 					gameStatus = myGame.status.status
-					msg.send 'Game status: ' + gameStatus
-				
+
 					if gameStatus is "Pre-Game" or gameStatus is "Preview"
 						awayProbablePitcher = myGame.away_probable_pitcher.last
 						apWins = myGame.away_probable_pitcher.wins
@@ -93,12 +102,9 @@ module.exports = (robot) ->
 							opponentTeamScore = myGame.linescore.r.home
 						else
 							msg.send 'error'
-						msg.send "Your team's score: " + myTeamScore
-						msg.send "Opponent's score: " + opponentTeamScore
 
 		# Check if the game is over
 					if gameStatus is 'Final'
-						msg.send 'game is over'
 						if myTeamScore > opponentTeamScore
 							msg.send 'The ' + team + ' beat ' + opponentTeam + ' today! ' + myGame.linescore.r.away + '-' + myGame.linescore.r.home
 						else if myTeamScore < opponentTeamScore
@@ -114,6 +120,20 @@ module.exports = (robot) ->
 							msg.send 'The ' + team + ' are trailing ' + opponentTeam + ' in the ' + inning_state + ' of inning ' + inning + ': ' + myGame.linescore.r.away + '-' + myGame.linescore.r.home
 						else if myTeamScore = opponentTeamScore
 							msg.send 'The ' + team + ' and ' + opponentTeam + ' are currently tied at ' + myGame.linescore.r.away + ' in the ' + inning_state + ' of inning ' + inning
+
+	robot.hear /my team/i, (msg) ->
+		msg.send team
+
+	robot.respond /standings (.*)|standings/i, (msg) ->
+		division = msg.match[1]
+		msg.http('https://erikberg.com/mlb/standings.json')
+			.header('User-Agent', 'hubot-mlbot (craigrow@hotmail.com)')
+			.get() (err, res, body) ->
+				data = JSON.parse(body)
+				standings = getStandings(data, division)
+
+				msg.send standings
+
 
 	getDay = () ->
 		today = new Date
@@ -196,3 +216,91 @@ module.exports = (robot) ->
 		else
 			city = "I don't know the " + team
 
+	getStandings = (data, division) ->
+		alCentral = """
+
+		American League Central
+		=======================
+		#{data.standing[0].last_name} \t #{data.standing[0].won}-#{data.standing[0].lost}
+		#{data.standing[1].last_name} \t #{data.standing[1].won}-#{data.standing[1].lost}
+		#{data.standing[2].last_name} \t #{data.standing[2].won}-#{data.standing[2].lost}
+		#{data.standing[3].last_name} \t #{data.standing[3].won}-#{data.standing[3].lost}
+		#{data.standing[4].last_name} \t #{data.standing[4].won}-#{data.standing[4].lost}
+
+"""
+
+		alEast = """
+
+		American League East
+		=======================
+		#{data.standing[5].last_name} \t #{data.standing[5].won}-#{data.standing[5].lost}
+		#{data.standing[6].last_name} \t #{data.standing[6].won}-#{data.standing[6].lost}
+		#{data.standing[7].last_name} \t #{data.standing[7].won}-#{data.standing[7].lost}
+		#{data.standing[8].last_name} \t #{data.standing[8].won}-#{data.standing[8].lost}
+		#{data.standing[9].last_name} \t #{data.standing[9].won}-#{data.standing[9].lost}
+
+		"""
+
+		alWest = """
+
+		American League West
+		=======================
+		#{data.standing[10].last_name} \t #{data.standing[10].won}-#{data.standing[10].lost}
+		#{data.standing[11].last_name} \t #{data.standing[11].won}-#{data.standing[11].lost}
+		#{data.standing[12].last_name} \t #{data.standing[12].won}-#{data.standing[12].lost}
+		#{data.standing[13].last_name} \t #{data.standing[13].won}-#{data.standing[13].lost}
+		#{data.standing[14].last_name} \t #{data.standing[14].won}-#{data.standing[14].lost}
+
+		"""
+
+		nlCentral = """
+
+		National League Central
+		=======================
+
+		#{data.standing[15].last_name} \t #{data.standing[15].won}-#{data.standing[15].lost}
+		#{data.standing[16].last_name} \t #{data.standing[16].won}-#{data.standing[16].lost}
+		#{data.standing[17].last_name} \t #{data.standing[17].won}-#{data.standing[17].lost}
+		#{data.standing[18].last_name} \t #{data.standing[18].won}-#{data.standing[18].lost}
+		#{data.standing[19].last_name} \t #{data.standing[19].won}-#{data.standing[19].lost}
+
+		"""
+
+		nlEast = """
+
+		National League East
+		=======================
+		#{data.standing[20].last_name} \t #{data.standing[20].won}-#{data.standing[20].lost}
+		#{data.standing[21].last_name} \t #{data.standing[21].won}-#{data.standing[21].lost}
+		#{data.standing[22].last_name} \t #{data.standing[22].won}-#{data.standing[22].lost}
+		#{data.standing[23].last_name} \t #{data.standing[23].won}-#{data.standing[23].lost}
+		#{data.standing[24].last_name} \t #{data.standing[24].won}-#{data.standing[24].lost}
+
+		"""
+
+		nlWest = """
+
+		National League West
+		=======================
+		#{data.standing[25].last_name} \t #{data.standing[25].won}-#{data.standing[25].lost}
+		#{data.standing[26].last_name} \t #{data.standing[26].won}-#{data.standing[26].lost}
+		#{data.standing[27].last_name} \t #{data.standing[27].won}-#{data.standing[27].lost}
+		#{data.standing[28].last_name} \t #{data.standing[28].won}-#{data.standing[28].lost}
+		#{data.standing[29].last_name} \t #{data.standing[29].won}-#{data.standing[29].lost}
+
+		"""
+
+		if division is "alc"
+			standings = alCentral
+		else if division is "ale"
+			standings = alEast
+		else if division is "alw"
+			standings = alWest
+		else if division is "nlc"
+			standings = nlCentral
+		else if division is "nle"
+			standings = nlEast
+		else if division is "nlw"
+			standings = nlWest
+		else
+			standings = alWest + alCentral + alEast + nlWest + nlCentral + nlEast
