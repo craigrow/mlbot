@@ -17,7 +17,6 @@
 # craigrow@hotmail.com
 
 module.exports = (robot) ->
-	team = ''
 	robot.hear /how (about|bout) (them|those) (.*)/i, (msg) ->
 		# Find the team's city
 		team = msg.match[3]
@@ -120,9 +119,6 @@ module.exports = (robot) ->
 							msg.send 'The ' + team + ' are trailing ' + opponentTeam + ' in the ' + inning_state + ' of inning ' + inning + ': ' + myGame.linescore.r.away + '-' + myGame.linescore.r.home
 						else if myTeamScore = opponentTeamScore
 							msg.send 'The ' + team + ' and ' + opponentTeam + ' are currently tied at ' + myGame.linescore.r.away + ' in the ' + inning_state + ' of inning ' + inning
-
-	robot.hear /my team/i, (msg) ->
-		msg.send team
 
 	robot.respond /standings (.*)|standings/i, (msg) ->
 		division = msg.match[1]
