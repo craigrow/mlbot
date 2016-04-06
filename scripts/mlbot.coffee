@@ -1,8 +1,6 @@
 # Description:
 #   Get MLB scores and standings
 #
-#
-#
 # Dependencies:
 #   None
 #
@@ -22,9 +20,7 @@ module.exports = (robot) ->
 	robot.hear /how (about|bout) (them|those) (.*)/i, (msg) ->
 		# Find the team's city
 		team = msg.match[3]
-		msg.send 'team: ' + team
 		city = getCity(team)
-		msg.send 'city: ' + city
 
 		# Get game data for today
 		day = getDay()
@@ -46,7 +42,6 @@ module.exports = (robot) ->
 				if gameData.data.games.game[gameNumber] is undefined
 					msg.send 'The ' + team + ' do not play today'
 				else
-					msg.send 'gameNumber: ' + gameNumber
 					myGame = gameData.data.games.game[gameNumber]
 
 		# Figure out if the team is home or away
@@ -58,7 +53,6 @@ module.exports = (robot) ->
 						homeAway = 'away'
 					else
 						homeAway = 'error'
-					msg.send 'homeAway: ' + homeAway
 
 		# Find the opponent's name
 					opponentTeam = ''
@@ -68,11 +62,9 @@ module.exports = (robot) ->
 						opponentTeam = myGame.home_team_city
 					else
 						opponentTeam = 'error'
-					msg.send 'opponentTeam: ' + opponentTeam
 
 		# Figure out if the game is in progress.
 					gameStatus = myGame.status.status
-					msg.send 'gameStatus: ' + gameStatus
 
 					if gameStatus is "Pre-Game" or gameStatus is "Preview"
 						awayProbablePitcher = myGame.away_probable_pitcher.last
@@ -102,11 +94,11 @@ module.exports = (robot) ->
 						opponentTeamScore = ''
 
 						if city is myGame.home_team_city
-							myTeamScore = myGame.linescore.r.home
-							opponentTeamScore = myGame.linescore.r.away
+							myTeamScore = parseInt(myGame.linescore.r.home, 10)
+							opponentTeamScore = parseInt(myGame.linescore.r.away, 10)
 						else if city is myGame.away_team_city
-							myTeamScore = myGame.linescore.r.away
-							opponentTeamScore = myGame.linescore.r.home
+							myTeamScore = parseInt(myGame.linescore.r.away, 10)
+							opponentTeamScore = parseInt(myGame.linescore.r.home, 10)
 						else
 							msg.send 'error'
 
