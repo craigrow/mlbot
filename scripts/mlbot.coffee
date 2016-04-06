@@ -259,7 +259,9 @@ module.exports = (robot) ->
 	robot.hear /how (about|bout) (them|those) (.*)/i, (msg) ->
 		# Find the team's city
 		team = msg.match[3]
+		msg.send 'team: ' + team
 		city = getCity(team)
+		msg.send 'city: ' + city
 
 		# Get game data for today
 		day = getDay()
@@ -279,8 +281,9 @@ module.exports = (robot) ->
 					if gameData.data.games.game[gameNumber] is undefined
 						break
 				if gameData.data.games.game[gameNumber] is undefined
-					msg.send 'The ' + team + ' did not play today'
+					msg.send 'The ' + team + ' do not play today'
 				else
+					msg.send 'gameNumber: ' + gameNumber
 					myGame = gameData.data.games.game[gameNumber]
 
 		# Figure out if the team is home or away
@@ -292,6 +295,7 @@ module.exports = (robot) ->
 						homeAway = 'away'
 					else
 						homeAway = 'error'
+					msg.send 'homeAway: ' + homeAway
 
 		# Find the opponent's name
 					opponentTeam = ''
@@ -301,9 +305,11 @@ module.exports = (robot) ->
 						opponentTeam = myGame.home_team_city
 					else
 						opponentTeam = 'error'
+					msg.send 'opponentTeam: ' + opponentTeam
 
 		# Figure out if the game is in progress.
 					gameStatus = myGame.status.status
+					msg.send 'gameStatus: ' + gameStatus
 
 					if gameStatus is "Pre-Game" or gameStatus is "Preview"
 						awayProbablePitcher = myGame.away_probable_pitcher.last
@@ -328,7 +334,7 @@ module.exports = (robot) ->
 							msg.send matchup
 
 		# Find the score of each team
-					else if gameStatus isnt 'Pre-Game' and gameStatus isnt 'Preview'
+					if gameStatus isnt 'Pre-Game' and gameStatus isnt 'Preview'
 						myTeamScore = ''
 						opponentTeamScore = ''
 
@@ -348,7 +354,7 @@ module.exports = (robot) ->
 						else if myTeamScore < opponentTeamScore
 							msg.send 'The ' + team + ' lost to ' + opponentTeam + ' today ' + myGame.linescore.r.away + '-' + myGame.linescore.r.home
 
-					if gameStatus is 'In Progress'
+					else if gameStatus is 'In Progress'
 						inning = myGame.status.inning
 						inning_state = myGame.status.inning_state
 
@@ -358,6 +364,9 @@ module.exports = (robot) ->
 							msg.send 'The ' + team + ' are trailing ' + opponentTeam + ' in the ' + inning_state + ' of inning ' + inning + ': ' + myGame.linescore.r.away + '-' + myGame.linescore.r.home
 						else if myTeamScore = opponentTeamScore
 							msg.send 'The ' + team + ' and ' + opponentTeam + ' are currently tied at ' + myGame.linescore.r.away + ' in the ' + inning_state + ' of inning ' + inning
+
+					else if gameStatus is 'Postponed'
+						msg.send 'Their game seems to have been rained out.'
 
 	robot.respond /standings (.*)|standings/i, (msg) ->
 		division = msg.match[1]
