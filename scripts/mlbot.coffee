@@ -149,7 +149,10 @@ module.exports = (robot) ->
 
 	getGame = (team, url, callback) ->
 		team = 'callback team: ' + team + 'callback url: ' + url
-		callback(team)
+		robot.http(url)
+			.get() (err, res, body) ->
+				gameData = JSON.parse(body)
+				callback(gameData)
 
 	getDay = () ->
 		today = new Date
