@@ -154,6 +154,16 @@ module.exports = (robot) ->
 					msg.send 'opponentTeam: ' + opponentTeam
 					getMyTeamScore myGame, city, homeAway, (myTeamScore) ->
 						msg.send 'myTeamScore: ' + myTeamScore
+						getOpponentTeamScore myGame, city, homeAway, (opponentTeamScore) ->
+							msg.send 'opponentTeamScore: ' + opponentTeamScore
+
+	getOpponentTeamScore = (myGame, city, homeAway, callback) ->
+		res = ''
+		if homeAway is 'away'
+			res = parseInt(myGame.linescore.r.home)
+		else if homeAway is 'home'
+			res = parseInt(myGame.linescore.r.away)
+		callback(res)
 
 	getMyTeamScore = (myGame, city, homeAway, callback) ->
 		res = ''
