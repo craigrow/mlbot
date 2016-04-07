@@ -17,6 +17,7 @@
 # craigrow@hotmail.com
 
 module.exports = (robot) ->
+	team = ''
 	robot.hear /how (about|bout) (them|those) (.*)/i, (msg) ->
 		# Find the team's city
 		team = msg.match[3]
@@ -132,6 +133,9 @@ module.exports = (robot) ->
 				standings = getStandings(data, division)
 
 				msg.send standings
+
+	robot.hear /yesterday/i, (msg) ->
+		msg.send team
 
 	getDay = () ->
 		today = new Date
