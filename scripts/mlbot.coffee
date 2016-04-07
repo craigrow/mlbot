@@ -148,11 +148,24 @@ module.exports = (robot) ->
 			msg.send 'myGame: ' + myGame
 
 	getGame = (team, url, callback) ->
-		team = 'callback team: ' + team + 'callback url: ' + url
+		msg = ''
 		robot.http(url)
 			.get() (err, res, body) ->
 				gameData = JSON.parse(body)
-				callback(gameData)
+
+				city = getCity(team)
+				gameNumber = 0
+				while gameData.data.games.game[gameNumber].home_team_city != city & gameData.data.games.game[gameNumber].away_team_city != city
+					gameNumber++
+					if gameData.data.games.game[gameNumber] is undefined
+						break
+				if gameData.data.games.game[gameNumber] is undefined
+					myGame = 'They did not play yesterday'
+				else
+					myGame = gameData.data.games.game[gameNumber]
+
+				msg = myGame + '      gameNumber: ' + gameNumber
+				callback(msg)
 
 	getDay = () ->
 		today = new Date
