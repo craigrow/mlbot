@@ -149,6 +149,9 @@ module.exports = (robot) ->
 
 	getGame = (team, url, callback) ->
 		team = 'callback team: ' + team + 'callback url: ' + url
+		robot.http(url)
+			.get() (err, res, body) ->
+				gameData = JSON.stringify(body)
 		callback(team)
 
 	getDay = () ->
