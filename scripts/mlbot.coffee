@@ -136,10 +136,19 @@ module.exports = (robot) ->
 
 	robot.hear /yesterday/i, (msg) ->
 		msg.send team
+		day = getYesterday()
+		msg.send 'day: ' + day
 
 	getDay = () ->
 		today = new Date
 		dd = today.getDate()
+		if dd < 10
+			dd = '0' + dd
+		else dd
+
+	getYesterday = () ->
+		yesterday = new Date
+		dd = yesterday.getDate() - 1
 		if dd < 10
 			dd = '0' + dd
 		else dd
