@@ -146,6 +146,20 @@ module.exports = (robot) ->
 
 		getGame team, url, (myGame) ->
 			msg.send 'myGame: ' + myGame
+			city = getCity(team)
+			msg.send 'city: ' + city
+			getHomeAway myGame, city, (homeAway) ->
+				msg.send 'homeAway: ' + homeAway
+
+	getHomeAway = (myGame, city, callback) ->
+		res = ''
+		if myGame.home_team_city is city
+			res = 'home'
+		else if myGame.away_team_city is city
+			res = 'away'
+		else
+			res = 'error'
+		callback(res)
 
 	getGame = (team, url, callback) ->
 		msg = ''
@@ -164,7 +178,7 @@ module.exports = (robot) ->
 				else
 					myGame = gameData.data.games.game[gameNumber]
 
-				msg = myGame + '      gameNumber: ' + gameNumber
+				msg = myGame
 				callback(msg)
 
 	getDay = () ->
