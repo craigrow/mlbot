@@ -144,6 +144,13 @@ module.exports = (robot) ->
 		url = 'http://mlb.mlb.com/gdcross/components/game/mlb/year_' + year + '/month_' + month + '/day_' + day + '/master_scoreboard.json'
 		msg.send 'url: ' + url
 
+		getGame team, (myGame) ->
+			msg.send 'myGame: ' + myGame
+
+	getGame = (team, callback) ->
+		team = 'callback team: ' + team
+		callback(team)
+
 	getDay = () ->
 		today = new Date
 		dd = today.getDate()
