@@ -150,6 +150,18 @@ module.exports = (robot) ->
 			msg.send 'city: ' + city
 			getHomeAway myGame, city, (homeAway) ->
 				msg.send 'homeAway: ' + homeAway
+			getOpponentTeam myGame, city, (opponentTeam) ->
+				msg.send 'opponentTeam: ' + opponentTeam
+
+	getOpponentTeam = (myGame, city, callback) ->
+		res = ''
+		if myGame.home_team_city is city
+			res = myGame.away_team_city
+		else if myGame.away_team_city is city
+			res = myGame.home_team_city
+		else
+			res = 'error'
+		callback(res)
 
 	getHomeAway = (myGame, city, callback) ->
 		res = ''
