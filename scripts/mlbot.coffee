@@ -134,7 +134,7 @@ module.exports = (robot) ->
 
 				msg.send standings
 
-	robot.hear /yesterday/i, (msg) ->
+	robot.hear /what about yesterday/i, (msg) ->
 		msg.send team
 		day = getYesterday()
 		month = getMonth()
