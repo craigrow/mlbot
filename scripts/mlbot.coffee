@@ -137,25 +137,17 @@ module.exports = (robot) ->
 	robot.hear /yesterday/i, (msg) ->
 		msg.send team
 		day = getYesterday()
-		msg.send 'day: ' + day
 		month = getMonth()
 		year = getYear()
 
 		url = 'http://mlb.mlb.com/gdcross/components/game/mlb/year_' + year + '/month_' + month + '/day_' + day + '/master_scoreboard.json'
-		msg.send 'url: ' + url
 
 		getGame team, url, (myGame) ->
-			msg.send 'myGame: ' + myGame
 			city = getCity(team)
-			msg.send 'city: ' + city
 			getHomeAway myGame, city, (homeAway) ->
-				msg.send 'homeAway: ' + homeAway
 				getOpponentTeam myGame, city, (opponentTeam) ->
-					msg.send 'opponentTeam: ' + opponentTeam
 					getMyTeamScore myGame, city, homeAway, (myTeamScore) ->
-						msg.send 'myTeamScore: ' + myTeamScore
 						getOpponentTeamScore myGame, city, homeAway, (opponentTeamScore) ->
-							msg.send 'opponentTeamScore: ' + opponentTeamScore
 
 							if myTeamScore > opponentTeamScore
 								msg.send 'They beat ' + opponentTeam + ' yesterday!'
