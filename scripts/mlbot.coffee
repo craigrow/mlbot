@@ -148,11 +148,10 @@ module.exports = (robot) ->
 				getOpponentTeam myGame, city, (opponentTeam) ->
 					getMyTeamScore myGame, city, homeAway, (myTeamScore) ->
 						getOpponentTeamScore myGame, city, homeAway, (opponentTeamScore) ->
-
 							if myTeamScore > opponentTeamScore
 								msg.send 'They beat ' + opponentTeam + ' yesterday!'
-							else if myTeamScore < OpponentTeamScore
-								msg.send 'They lost to ' + opponentTeam + 'yesterday :-('
+							else if myTeamScore < opponentTeamScore
+								msg.send 'They lost to ' + opponentTeam + ' yesterday :-('
 
 	getOpponentTeamScore = (myGame, city, homeAway, callback) ->
 		res = ''
